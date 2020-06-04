@@ -30,6 +30,7 @@ private:
 	string information;
 	void inputinformation();
 	void outputinformation();
+	void NotUsefullFunction();
 };
 
 
@@ -80,6 +81,12 @@ void archivator::outputinformation()
 		inp.clear();
 	}
 	fin.close();
+}
+
+void archivator::NotUsefullFunction()
+{
+	cout << "Compresing... " << inputfile << " in " << outputfile << endl;
+	cout << "Done" << endl;
 }
 
 
