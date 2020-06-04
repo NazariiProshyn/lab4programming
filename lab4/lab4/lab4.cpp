@@ -29,7 +29,7 @@ public:
 private:
 	string information;
 	void inputinformation();
-	
+	void outputinformation();
 };
 
 
@@ -51,7 +51,7 @@ archivator::archivator(int argc, char* argv[])
 	else if (function == "--decompress") {
 		inputfile = argv[2];
 		CreateDictionary();
-
+		outputinformation();
 	}
 }
 
@@ -67,6 +67,21 @@ void archivator::inputinformation()
 	}
 	fin.close();
 }
+
+void archivator::outputinformation()
+{
+	ifstream fin(inputfile);
+	int i = 0; string inp;
+	while (!fin.eof())
+	{
+		fin >> inp;
+		if (i == 0) { information += inp; i++; }
+		else { information += " " + inp; }
+		inp.clear();
+	}
+	fin.close();
+}
+
 
 void Data::CreateDictionary()
 {
