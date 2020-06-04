@@ -13,6 +13,7 @@ public:
 	//void setnameoffile(string setname);
 	//string nameoffile();
 protected:
+	vector <int> archive_out;
 	int size = 255, code = 256;
 	void CreateDictionary();
 	unordered_map<string, int> Dictionary;
@@ -31,6 +32,9 @@ private:
 	void inputinformation();
 	void outputinformation();
 	void NotUsefullFunction();
+	void NotUsefullFunction2();
+	void archive_file();
+	void Create_Archive();
 };
 
 
@@ -48,6 +52,7 @@ archivator::archivator(int argc, char* argv[])
 		outputfile = argv[2];
 		CreateDictionary();
 		inputinformation();
+		NotUsefullFunction();
 	}
 	else if (function == "--decompress") {
 		inputfile = argv[2];
@@ -87,6 +92,48 @@ void archivator::NotUsefullFunction()
 {
 	cout << "Compresing... " << inputfile << " in " << outputfile << endl;
 	cout << "Done" << endl;
+}
+
+void archivator::NotUsefullFunction2()
+{
+	cout << "Getting out file " << outputfile << " ..." << endl;
+	cout << "Done" << endl;
+}
+
+void archivator::archive_file()
+{
+	string char1 = "", char2 = "";
+	char1 += information[0];
+	for (int i = 0; i < information.length(); i++) {
+		if (i != information.length() - 1)
+			char2 += information[i + 1];
+		if (Dictionary.find(char1 + char2) != Dictionary.end()) {
+			char1 = char1 + char2;
+		}
+		else {
+			archive_out.push_back(Dictionary[char2]);
+			Dictionary[char1 + char2] = code;
+			code++;
+			char1 = char2;
+		}
+		char2 = "";
+	}
+	archive_out.push_back(Dictionary[char1]);
+	Create_Archive();
+}
+
+void archivator::Create_Archive()
+{
+	ofstream fout(outputfile);
+	for (int i = 0; i < archive_out.size() + 1; i++)
+	{
+		if (i == 0) {
+			fout << inputfile << " ";
+			continue;
+		}
+		fout << archive_out[i - 1] << " ";
+	}
+	fout.close();
 }
 
 
