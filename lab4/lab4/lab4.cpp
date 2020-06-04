@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
 {
 	archivator archive(argc, argv);
 }
-
+//конструктор
 archivator::archivator(int argc, char* argv[])
 {
 	function = argv[1];
@@ -53,14 +53,16 @@ archivator::archivator(int argc, char* argv[])
 		CreateDictionary();
 		inputinformation();
 		NotUsefullFunction();
+		archive_file();
 	}
 	else if (function == "--decompress") {
 		inputfile = argv[2];
 		CreateDictionary();
 		outputinformation();
+		NotUsefullFunction2();
 	}
 }
-
+//зчитування для архівування
 void archivator::inputinformation()
 {
 	ifstream fin(inputfile);
@@ -73,7 +75,7 @@ void archivator::inputinformation()
 	}
 	fin.close();
 }
-
+//зчитування для розархівування
 void archivator::outputinformation()
 {
 	ifstream fin(inputfile);
@@ -87,19 +89,19 @@ void archivator::outputinformation()
 	}
 	fin.close();
 }
-
+//вивід
 void archivator::NotUsefullFunction()
 {
 	cout << "Compresing... " << inputfile << " in " << outputfile << endl;
 	cout << "Done" << endl;
 }
-
+//вивід
 void archivator::NotUsefullFunction2()
 {
 	cout << "Getting out file " << outputfile << " ..." << endl;
 	cout << "Done" << endl;
 }
-
+//створення даних для архіву
 void archivator::archive_file()
 {
 	string char1 = "", char2 = "";
@@ -121,7 +123,7 @@ void archivator::archive_file()
 	archive_out.push_back(Dictionary[char1]);
 	Create_Archive();
 }
-
+//створення архіву
 void archivator::Create_Archive()
 {
 	ofstream fout(outputfile);
@@ -136,7 +138,7 @@ void archivator::Create_Archive()
 	fout.close();
 }
 
-
+//словник
 void Data::CreateDictionary()
 {
 	string val;
