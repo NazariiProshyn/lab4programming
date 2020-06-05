@@ -1,150 +1,191 @@
 ﻿
 #include <iostream>
-#include<string>
+#include <string>
+#include <vector>
+#include <fstream>
 #include <unordered_map>
-#include<fstream>
-using namespace std;
-class Data
-{
-public:
 
-	///void setfunction(string set);
-	//string getfunction();
-	//void setnameoffile(string setname);
-	//string nameoffile();
+using namespace std;
+
+
+
+class DATA {
 protected:
-	vector <int> archive_out;
-	int size = 255, code = 256;
-	void CreateDictionary();
-	unordered_map<string, int> Dictionary;
-	string function;
+	int size = 255;
+	vector<int> output;
+	int code = 256;
+	string method;
 	string inputfile;
 	string outputfile;
+	void Create_Dictionary();
+	unordered_map<string, int> Dictionary;
+	void InfDecom();
+	void InfCom();
+
 };
 
-class archivator :public Data
-{
-public:
-	archivator(int argc, char* argv[]);
-
-private:
+class ARCHIVATOR :public DATA {
 	string information;
-	void inputinformation();
-	void outputinformation();
-	void NotUsefullFunction();
-	void NotUsefullFunction2();
-	void archive_file();
-	void Create_Archive();
+	
+	void InputInformation();
+	void OutputInformation();
+	void outputDict();
+	void InArchive();
+	void OutArchive();
+	void CreateArchive();
+public:
+	ARCHIVATOR(int argc, char* argv[]);
 };
+
 
 
 
 int main(int argc, char* argv[])
 {
-	archivator archive(argc, argv);
+	ARCHIVATOR archivator(argc,argv);
+   
 }
-//конструктор
-archivator::archivator(int argc, char* argv[])
+
+
+void DATA::InfCom() {
+	cout << "Compresing " << inputfile << " in " << outputfile << endl;
+	cout << "Done" << endl;
+}
+void DATA::InfDecom() {
+	cout << "Getting out file " << outputfile<< endl;
+	cout << "Done" << endl;
+}
+
+ARCHIVATOR::ARCHIVATOR(int argc, char* argv[])
 {
-	function = argv[1];
-	if (function == "--compress") {
-		inputfile = argv[3];
-		outputfile = argv[2];
-		CreateDictionary();
-		inputinformation();
-		NotUsefullFunction();
-		archive_file();
+	method=argv[1];
+	if (method == "--compress") {//
+		inputfile=argv[3];//
+		outputfile=argv[2];//
+		Create_Dictionary();//
+		InputInformation();//
+		InfCom();//
+		InArchive();//
 	}
-	else if (function == "--decompress") {
-		inputfile = argv[2];
-		CreateDictionary();
-		outputinformation();
-		NotUsefullFunction2();
+	else if (method == "--decompress") {//
+		inputfile=argv[2];//
+		Create_Dictionary();//
+		OutputInformation();//
+		InfDecom();//
+		OutArchive();
 	}
 }
-//зчитування для архівування
-void archivator::inputinformation()
-{
+void ARCHIVATOR::InputInformation() {
 	ifstream fin(inputfile);
-	int i = 0; string inp;
+	int i = 0;
 	while (!fin.eof()) {
-		fin >> inp;
-		if (i == 0) { information += inp; i++; }
-		else { information += " " + inp; }
-		inp.clear();
+		string val;
+		fin >> val;
+		if (i == 0) {
+			information += val;
+			i++;
+		}
+		else
+			information += " " + val;
 	}
 	fin.close();
 }
-//зчитування для розархівування
-void archivator::outputinformation()
-{
-	ifstream fin(inputfile);
-	int i = 0; string inp;
-	while (!fin.eof())
+
+void ARCHIVATOR::OutputInformation() {
+	fstream fin(inputfile);
+	int i = 0;
+	
+	char* val = new char[code];
+	while (!fin.eof()) {
+		if (i == 0) {
+			fin >> val;
+			i++;
+			outputfile=val;
+		}
+		int temp;
+		fin >> temp;
+		output.push_back(temp);
+	}
+	fin.close();
+}
+
+void DATA::Create_Dictionary() {
+	string val;
+	for (int i = 0; i < code; i++) {
+		 val = "";
+		val += char(i);
+		Dictionary[val] = i;
+		val.clear();
+	}
+}
+void ARCHIVATOR::outputDict() {
+	for (int i = 0; i <= size; i++) {
+		string ch = "";
+		ch += char(i);
+		cout << Dictionary[ch] << " , ";
+	}
+	cout << endl;
+}
+void ARCHIVATOR::CreateArchive() {
+	ofstream fout(outputfile);
+	for (int i = 0; i < output.size() + 1; i++)
 	{
-		fin >> inp;
-		if (i == 0) { information += inp; i++; }
-		else { information += " " + inp; }
-		inp.clear();
+		if (i == 0) {fout << inputfile << " ";continue;}
+		fout << output[i - 1] << " ";
 	}
-	fin.close();
+	fout.close();
 }
-//вивід
-void archivator::NotUsefullFunction()
-{
-	cout << "Compresing... " << inputfile << " in " << outputfile << endl;
-	cout << "Done" << endl;
-}
-//вивід
-void archivator::NotUsefullFunction2()
-{
-	cout << "Getting out file " << outputfile << " ..." << endl;
-	cout << "Done" << endl;
-}
-//створення даних для архіву
-void archivator::archive_file()
-{
+void ARCHIVATOR::InArchive() {
 	string char1 = "", char2 = "";
 	char1 += information[0];
 	for (int i = 0; i < information.length(); i++) {
 		if (i != information.length() - 1)
 			char2 += information[i + 1];
-		if (Dictionary.find(char1 + char2) != Dictionary.end()) {
-			char1 = char1 + char2;
-		}
+		if (Dictionary.find(char1 + char2) != Dictionary.end()) {char1 = char1 + char2;}
 		else {
-			archive_out.push_back(Dictionary[char2]);
+			output.push_back(Dictionary[char1]);
 			Dictionary[char1 + char2] = code;
 			code++;
 			char1 = char2;
 		}
 		char2 = "";
 	}
-	archive_out.push_back(Dictionary[char1]);
-	Create_Archive();
+	output.push_back(Dictionary[char1]);
+	CreateArchive();
 }
-//створення архіву
-void archivator::Create_Archive()
-{
-	ofstream fout(outputfile);
-	for (int i = 0; i < archive_out.size() + 1; i++)
-	{
-		if (i == 0) {
-			fout << inputfile << " ";
-			continue;
+void ARCHIVATOR::OutArchive() {
+	unordered_map<int, string> val;
+	string num ;
+	for (int i = 0; i <code; i++) {
+		
+		num += char(i);
+		val[i] = num;
+		num.clear();
+	}
+	int old = output[0], n;
+	string c = "";
+	string sc = val[old];
+	string str;
+	c += sc[0];
+	str += sc;
+	int count = 256;
+	for (int i = 0; i < output.size() - 1; i++) {
+		n = output[i + 1];
+		if (val.find(n) == val.end()) {	sc = val[old];	sc = sc + c;}	
+		else {
+			sc = val[n];
 		}
-		fout << archive_out[i - 1] << " ";
+		str += sc;
+		c = "";
+		c += sc[0];
+		val[count] = val[old] + c;
+		count++;
+		old = n;
 	}
-	fout.close();
-}
-
-//словник
-void Data::CreateDictionary()
-{
-	string val;
-	for (int i = 0; i < code; i++) {
-		val = '0' + i;
-		Dictionary[val] = i;
-		val.clear();
+	string name = outputfile;
+	ofstream out(name);
+	for (int i = 0; i < str.size(); i++) {
+		out << str[i];
 	}
+	out.close();
 }
